@@ -181,12 +181,14 @@ fn handle_client(mut stream: TcpStream) {
 
 fn main() {
     let port = env::var("PORT").unwrap_or("8080".to_string());
-    let listener = TcpListener::bind(format!("0.0.0.0:{}", port)).unwrap();
-    println!("Server running at http://0.0.0.0:{}", port);
+    let addr = format!("0.0.0.0:{}", port);
+
+    let listener = TcpListener::bind(&addr).unwrap();
+    println!("Server running on {}", addr);
 
     for stream in listener.incoming() {
         if let Ok(stream) = stream {
-            thread::spawn(|| handle_client(stream));
+            std::thread::spawn(|| handle_client(stream));
         }
     }
 }
