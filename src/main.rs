@@ -10,60 +10,108 @@ const UPLOAD_DIR: &str = "uploads";
 // Embed the HTML/JS files directly
 const UPLOAD_HTML: &str = r#"<!DOCTYPE html>
 <html>
-<head><title>Upload File</title></head>
+<head>
+    <title>Upload File</title>
+</head>
 <body>
+
 <h2>Upload a file</h2>
+
+<button onclick="location.href='/download.html'">
+    Go to Download Page
+</button>
+
+<br><br>
+
 <input type="file" id="fileInput" />
 <button id="submit">Upload</button>
+
 <script>
 const SERVER_URL = '';
+
 const fileInput = document.getElementById('fileInput');
 const submitButton = document.getElementById('submit');
+
 submitButton.addEventListener('click', async (e) => {
     e.preventDefault();
+
     const file = fileInput.files[0];
-    if (!file) { alert("Select a file first!"); return; }
+    if (!file) {
+        alert("Select a file first!");
+        return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+
     try {
-        const res = await fetch(`${SERVER_URL}/upload_file`, { method: 'POST', body: formData });
+        const res = await fetch(`${SERVER_URL}/upload_file`, {
+            method: 'POST',
+            body: formData
+        });
         const text = await res.text();
         alert(text);
-    } catch (err) { console.error(err); alert("Upload failed!"); }
+    } catch (err) {
+        console.error(err);
+        alert("Upload failed!");
+    }
 });
 </script>
+
 </body>
 </html>"#;
 
+
 const DOWNLOAD_HTML: &str = r#"<!DOCTYPE html>
 <html>
-<head><title>Download Files</title></head>
+<head>
+    <title>Download Files</title>
+</head>
 <body>
+
 <h2>Uploaded Files</h2>
+
+<button onclick="location.href='/upload.html'">
+    Go to Upload Page
+</button>
+
+<br><br>
+
 <ul id="fileList"></ul>
+
 <script>
 const SERVER_URL = '';
+
 async function fetchFiles() {
     try {
         const res = await fetch(`${SERVER_URL}/files`);
         const files = await res.json();
+
         const list = document.getElementById('fileList');
         list.innerHTML = "";
+
         files.forEach(f => {
             const li = document.createElement('li');
             const a = document.createElement('a');
-            a.href = `${SERVER_URL}/download/${f}`;
+
+            a.href = `${SERVER_URL}/download/${encodeURIComponent(f)}`;
             a.textContent = f;
             a.download = f;
+
             li.appendChild(a);
             list.appendChild(li);
         });
-    } catch(e){ console.error(e); }
+    } catch (e) {
+        console.error(e);
+    }
 }
+
 window.onload = fetchFiles;
 </script>
+
 </body>
 </html>"#;
+
 
 fn handle_client(mut stream: TcpStream) {
     let mut buffer = Vec::new();
