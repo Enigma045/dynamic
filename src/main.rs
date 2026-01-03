@@ -128,7 +128,7 @@ fn handle_client(mut stream: TcpStream) {
     let request_line = request_text.lines().next().unwrap_or("");
 
     // Serve upload.html
-    if request_line.starts_with("GET /upload.html") || request_line.starts_with("GET /") {
+    if request_line.starts_with("GET /upload.html") {
         let response = format!(
             "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
             UPLOAD_HTML.len(),
